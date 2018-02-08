@@ -1,0 +1,23 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+Vagrant.configure("2") do |config|
+
+  # box名
+  config.vm.box = "dnsManager"
+
+  # local接続時のIPの設定
+  config.vm.network "forwarded_port", guest: 80, host: 8080
+
+  # 共有フォルダの設定
+  config.vm.synced_folder "../", "/home/domainNameManager/", :owner => 'vagrant', :group => 'vagrant', mount_options: %w["dmode=777,fmode=755"]
+
+  # FIXME ansibleかなんかにうつす
+  config.vm.provision "shell", path: "./setup.sh"
+
+  # chkconfig がなんかきかないので
+  config.vm.provision "shell", inline: "service iptables stop",
+    run: "always"
+  config.vm.provision "shell", inline: "service httpd start",
+    run: "always"
+
+end
