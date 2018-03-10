@@ -27,7 +27,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'domainName',
             'host',
             'updatedAt',
-            //'createdAt',
+            'createdAt',
             //'zone_id',
 
             ['class' => 'yii\grid\ActionColumn'],

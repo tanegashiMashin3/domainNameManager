@@ -12,17 +12,11 @@ use yii\widgets\ActiveForm;
 
     <?php $form = ActiveForm::begin(); ?>
 
-    <?= $form->field($model, 'recordType')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'recordType')->dropDownList($model::$allowedRecordType) ?>
 
     <?= $form->field($model, 'domainName')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'host')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'updatedAt')->textInput() ?>
-
-    <?= $form->field($model, 'createdAt')->textInput() ?>
-
-    <?= $form->field($model, 'zone_id')->textInput() ?>
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
