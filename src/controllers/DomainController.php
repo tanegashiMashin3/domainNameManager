@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use Yii;
 use app\models\Domain;
+use app\models\Zone;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -65,11 +66,33 @@ class DomainController extends Controller
     public function actionCreate()
     {
         $model = new Domain();
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if (Yii::$app->request->isGet) {
+            return $this->render('create', [
+                'model' => $model,
+            ]);
         }
 
+        // FIXME 増えることはおそらくないので、固定zoneを指定
+        $model->load(Yii::$app->request->post());
+        $model->zone_id = 1;
+
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            if (!$model->save()) {
+                $transaction->rollBack();
+                return $this->render('create', [
+                    'model' => $model,
+                ]);
+            }
+
+            $transaction->commit(); 
+
+            return $this->redirect(['view', 'id' => $model->id]);
+
+        } catch (Exception $e) {
+            $transaction->rollback();
+            // TODO エラーを追加する
+        }
         return $this->render('create', [
             'model' => $model,
         ]);
@@ -86,8 +109,16 @@ class DomainController extends Controller
     {
         $model = $this->findModel($id);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            if ($model->load(Yii::$app->request->post()) && $model->save()) {
+
+                $transaction->commit();
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
+        } catch (Exception $e) {
+            $transaction->rollback();
+            $model->addError('host', 'DB更新に失敗しました。');
         }
 
         return $this->render('update', [

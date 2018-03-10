@@ -47,6 +47,13 @@ class Zone extends \yii\db\ActiveRecord
         ];
     }
 
+    public function relations()
+    {
+        return [
+            'domains' => [self::HAS_MANY, 'Domain'],
+        ];
+    }
+
     /**
      * @return \yii\db\ActiveQuery
      */
