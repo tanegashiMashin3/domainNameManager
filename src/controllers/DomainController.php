@@ -84,9 +84,8 @@ class DomainController extends Controller
                     'model' => $model,
                 ]);
             }
-
+            $this->saveWithDnsReload($model);
             $transaction->commit(); 
-
             return $this->redirect(['view', 'id' => $model->id]);
 
         } catch (Exception $e) {
@@ -113,6 +112,7 @@ class DomainController extends Controller
         try {
             if ($model->load(Yii::$app->request->post()) && $model->save()) {
 
+                $this->saveWithDnsReload($model);
                 $transaction->commit();
                 return $this->redirect(['view', 'id' => $model->id]);
             }
@@ -124,6 +124,16 @@ class DomainController extends Controller
         return $this->render('update', [
             'model' => $model,
         ]);
+    }
+
+    /**
+     * 保存後、BINDに即時反映する
+     */
+    private function saveWithDnsReload(Domain $domain)
+    {
+        $domain->zone->updateZoneFile();
+
+        return true;
     }
 
     /**
