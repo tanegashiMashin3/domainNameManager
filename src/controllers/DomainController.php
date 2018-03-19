@@ -145,7 +145,18 @@ class DomainController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $domain = $this->findModel($id);
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            $domain->delete();
+
+            $this->saveWithDnsReload($domain);
+            $transaction->commit();
+            return $this->redirect(['index']);
+        } catch (Exception $e) {
+            $transaction->rollback();
+            $model->addError('host', 'DB更新に失敗しました。');
+        }
 
         return $this->redirect(['index']);
     }
