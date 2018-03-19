@@ -22,6 +22,8 @@ class Domain extends \yii\db\ActiveRecord
     // TODO 環境設定ファイルに書き出したい
     const ALLOWED_IP_RANGE = '192.168.0.0/24';
 
+    const REGEX = '/^[a-zA-Z0-9][a-zA-Z0-9\-]{1,61}[A-Za-z0-9]$/';
+
     public static $allowedRecordType = [
         'A' => 'A',
         // 'MX' => 'MX',
@@ -46,6 +48,7 @@ class Domain extends \yii\db\ActiveRecord
             [['recordType', 'domainName', 'host', 'zone_id'], 'required'],
             [['host'], 'ip', 'ranges' => [self::ALLOWED_IP_RANGE]],
             [['host'], 'hostValidator'],
+            [['domainName'], 'match', 'pattern' => self::REGEX],
             [['updatedAt', 'createdAt'], 'safe'],
             [['zone_id'], 'integer'],
             [['recordType', 'domainName', 'host'], 'string', 'max' => 255],
