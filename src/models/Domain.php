@@ -49,6 +49,7 @@ class Domain extends \yii\db\ActiveRecord
             [['host'], 'ip', 'ranges' => [self::ALLOWED_IP_RANGE]],
             [['host'], 'hostValidator'],
             [['domainName'], 'match', 'pattern' => self::REGEX],
+            [['domainName'], 'unique'],
             [['updatedAt', 'createdAt'], 'safe'],
             [['zone_id'], 'integer'],
             [['recordType', 'domainName', 'host'], 'string', 'max' => 255],
@@ -73,7 +74,7 @@ class Domain extends \yii\db\ActiveRecord
         }
 
         // 重複チェック
-        $domain = Domain::find()->where([$attribute => $this->$attribute]);
+        $domain = Domain::find()->where([$attribute => $this->$attribute, 'domainName' => $this->domainName]);
 
         if (!$this->isNewRecord) {
             $domain->andWhere("id<>{$this->id}");
